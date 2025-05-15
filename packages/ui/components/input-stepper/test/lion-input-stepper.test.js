@@ -276,7 +276,7 @@ describe('<lion-input-stepper>', () => {
         await el.updateComplete;
         expect(el.modelValue).to.equal(60, 'Fail + : (0 > 100 by 10; val 55)');
 
-        // min 1
+        // + min 1
         el = await fixture(
           html`<lion-input-stepper step="10" min="1" max="100" value="55"></lion-input-stepper>`,
         );
@@ -285,7 +285,7 @@ describe('<lion-input-stepper>', () => {
         await el.updateComplete;
         expect(el.modelValue).to.equal(61, 'Fail + : (1 > 100 by 10; val 55)');
 
-        // min 34
+        // + min 34
         el = await fixture(
           html`<lion-input-stepper step="10" min="34" max="100" value="55"></lion-input-stepper>`,
         );
@@ -294,7 +294,7 @@ describe('<lion-input-stepper>', () => {
         await el.updateComplete;
         expect(el.modelValue).to.equal(64, 'Fail + : (34 > 100 by 10; val 55)');
 
-        // min -23
+        // + min -23
         el = await fixture(
           html`<lion-input-stepper step="10" min="-23" max="100" value="55"></lion-input-stepper>`,
         );
@@ -303,7 +303,7 @@ describe('<lion-input-stepper>', () => {
         await el.updateComplete;
         expect(el.modelValue).to.equal(57, 'Fail + : (-23 > 100 by 10; val 55)'); // -23 > -13 > -3 > 7 > ... > 57
 
-        // min -23
+        // + min -23 (below 0)
         el = await fixture(
           html`<lion-input-stepper step="10" min="-23" max="100" value="-9"></lion-input-stepper>`,
         );
@@ -311,6 +311,18 @@ describe('<lion-input-stepper>', () => {
         incrementButton?.dispatchEvent(new Event('click'));
         await el.updateComplete;
         expect(el.modelValue).to.equal(-3, 'Fail + : (-23 > 100 by 10; val 55)'); // -23 > -13 > -3 > 7
+
+        // + min -23 (below 0) reaching min then +
+        el = await fixture(
+          html`<lion-input-stepper step="10" min="-23" max="100" value="-20"></lion-input-stepper>`,
+        );
+
+        const decrementButton = el.querySelector('[slot=prefix]');
+        decrementButton?.dispatchEvent(new Event('click'));
+        incrementButton = el.querySelector('[slot=suffix]');
+        incrementButton?.dispatchEvent(new Event('click'));
+        await el.updateComplete;
+        expect(el.modelValue).to.equal(-13, 'Fail + : (-23 > 100 by 10; val -20)'); // -23 > -13
       });
 
       it('aligns the value to the nearest step when decrementing', async () => {
@@ -322,7 +334,7 @@ describe('<lion-input-stepper>', () => {
         await el.updateComplete;
         expect(el.modelValue).to.equal(50, 'Fail - : (0 > 100 by 10; val 55)');
 
-        // min 1
+        // - min 1
         el = await fixture(
           html`<lion-input-stepper step="10" min="1" max="100" value="55"></lion-input-stepper>`,
         );
@@ -331,7 +343,7 @@ describe('<lion-input-stepper>', () => {
         await el.updateComplete;
         expect(el.modelValue).to.equal(51, 'Fail - : (1 > 100 by 10; val 55)');
 
-        // min 34
+        // - min 34
         el = await fixture(
           html`<lion-input-stepper step="10" min="34" max="100" value="55"></lion-input-stepper>`,
         );
@@ -340,7 +352,7 @@ describe('<lion-input-stepper>', () => {
         await el.updateComplete;
         expect(el.modelValue).to.equal(54, 'Fail - : (34 > 100 by 10; val 55)');
 
-        // min -23
+        // - min -23
         el = await fixture(
           html`<lion-input-stepper step="10" min="-23" max="100" value="55"></lion-input-stepper>`,
         );
@@ -349,7 +361,7 @@ describe('<lion-input-stepper>', () => {
         await el.updateComplete;
         expect(el.modelValue).to.equal(47, 'Fail - : (-23 > 100 by 10; val 55)'); // -23 > -13 > -3 > 7 > ... > 47
 
-        // min -23
+        // - min -23 below 0
         el = await fixture(
           html`<lion-input-stepper step="10" min="-23" max="100" value="-9"></lion-input-stepper>`,
         );
@@ -357,6 +369,18 @@ describe('<lion-input-stepper>', () => {
         decrementButton?.dispatchEvent(new Event('click'));
         await el.updateComplete;
         expect(el.modelValue).to.equal(-13, 'Fail - : (-23 > 100 by 10; val 55)'); // -23 > -13 > -3 > 7
+
+        // - min -3 reaching max then -
+        el = await fixture(
+          html`<lion-input-stepper step="10" min="3" max="100" value="95"></lion-input-stepper>`,
+        );
+
+        const incrementButton = el.querySelector('[slot=suffix]');
+        incrementButton?.dispatchEvent(new Event('click'));
+        decrementButton = el.querySelector('[slot=prefix]');
+        decrementButton?.dispatchEvent(new Event('click'));
+        await el.updateComplete;
+        expect(el.modelValue).to.equal(93, 'Fail - : (3 > 100 by 10; val 95)'); // 3 > ... > 100 > 93
       });
     });
   });

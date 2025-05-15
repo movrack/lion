@@ -265,17 +265,13 @@ export class LionInputStepper extends LocalizeMixin(LionInput) {
    * @private
    */
   __increment() {
-    const { step, max } = this.values;
-    let { min } = this.values;
-    if (min === Infinity) {
-      min = 0;
-    }
+    const { step, max, min } = this.values;
+    const stepMin = min !== Infinity ? min : 0;
 
     let newValue = this.currentValue + step;
-
-    if ((this.currentValue + min) % step !== 0) {
-      // If the value is not aligned to step, align it to the nearest step
-      newValue = Math.floor(this.currentValue / step) * step + step + (min % step);
+    if ((this.currentValue - stepMin) % step !== 0) {
+      // Align to the next nearest step multiple
+      newValue = stepMin + Math.ceil((this.currentValue - stepMin) / step) * step;
     }
 
     if (newValue <= max || max === Infinity) {
@@ -294,10 +290,9 @@ export class LionInputStepper extends LocalizeMixin(LionInput) {
     const stepMin = min !== Infinity ? min : 0;
 
     let newValue = this.currentValue - step;
-
-    if ((this.currentValue + stepMin) % step !== 0) {
-      // If the value is not aligned to step, align it to the nearest step
-      newValue = Math.floor(this.currentValue / step) * step + (stepMin % step);
+    if ((this.currentValue - stepMin) % step !== 0) {
+      // Align to the previous nearest step multiple
+      newValue = stepMin + Math.floor((this.currentValue - stepMin) / step) * step;
     }
 
     if (newValue >= min || min === Infinity) {
